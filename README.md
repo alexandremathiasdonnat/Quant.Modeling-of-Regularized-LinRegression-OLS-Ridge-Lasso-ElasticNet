@@ -14,11 +14,11 @@ While `scikit-learn` performs these optimizations internally, we explicitly deri
 
 At the heart of all optimization problems lies the **additivity of derivatives**:  
 if a cost function is composed of two differentiable parts,
-$$L(\theta) = f(\theta) + g(\theta),$$
-then its gradient satisfies
-$$\frac{\partial L(\theta)}{\partial \theta} 
-= \frac{\partial f(\theta)}{\partial \theta} 
-+ \frac{\partial g(\theta)}{\partial \theta}.$$
+L(θ) = f(θ) + g(θ)
+
+then its gradient satisfies:
+
+∂L(θ)/∂θ = ∂f(θ)/∂θ + ∂g(θ)/∂θ
 
 This rule allows us to decompose each regularized regression objective into:
 - a **data-fitting term** $f(\beta) = \|y - X\beta\|_2^2$
