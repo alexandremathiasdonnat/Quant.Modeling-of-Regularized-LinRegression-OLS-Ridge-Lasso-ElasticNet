@@ -12,72 +12,94 @@ While `scikit-learn` performs these optimizations internally, we explicitly deri
 
 ## Gradient Principle  
 
-At the heart of all optimization problems lies the **additivity of derivatives**:  
+At the heart of all optimization problems lies the additivity of derivatives:  
 if a cost function is composed of two differentiable parts,
-L(θ) = f(θ) + g(θ)
+
+    L(θ) = f(θ) + g(θ)
 
 then its gradient satisfies:
 
-∂L(θ)/∂θ = ∂f(θ)/∂θ + ∂g(θ)/∂θ
+    ∂L(θ)/∂θ = ∂f(θ)/∂θ + ∂g(θ)/∂θ
 
 This rule allows us to decompose each regularized regression objective into:
-- a **data-fitting term** $f(\beta) = \|y - X\beta\|_2^2$
-- and a **penalization term** $g(\beta) = \lambda \|\beta\|_p^p$,  
-    where $p = 1$ (Lasso) or $p = 2$ (Ridge).
+- a data-fitting term:  f(β) = ‖y − Xβ‖₂²
+- and a penalization term:  g(β) = λ‖β‖ₚᵖ  
+  where p = 1 (Lasso) or p = 2 (Ridge).
 
 The total derivative is given by:
 
-∂J(β)/∂β = ∂/∂β ‖y − Xβ‖² + ∂/∂β [ λ‖β‖ᵖᵖ ]
-and the first-order optimality condition
-∂J(β)/∂β = 0
-defines the analytical or subgradient solutions for **OLS**, **Ridge**, **Lasso**, and **ElasticNet**.
+    ∂J(β)/∂β = ∂/∂β ‖y − Xβ‖² + ∂/∂β [ λ‖β‖²²]
 
+and the first-order optimality condition
+
+    ∂J(β)/∂β = 0
+
+defines the analytical or subgradient solutions for OLS, Ridge, Lasso, and ElasticNet.
 
 ---
 
 ## Mathematical Framework  
 
 We consider the generalized penalized least squares problem:
-$$\min_{\beta} \; J(\beta) = \|y - X\beta\|_2^2 + 
-\lambda \big[(1-\gamma)\|\beta\|_2^2 + \gamma\|\beta\|_1\big]$$
+
+    minimize over β:  
+    J(β) = ‖y − Xβ‖₂² + λ[(1 − γ)‖β‖₂² + γ‖β‖₁]
+
 where  
-- $\lambda > 0$ controls the **regularization strength**,  
-- $\gamma \in [0,1]$ interpolates between Ridge (γ=0) and Lasso (γ=1).
+- λ > 0 controls the regularization strength,  
+- γ ∈ [0, 1] interpolates between Ridge (γ = 0) and Lasso (γ = 1).
 
 ---
 
 ### 1. Ordinary Least Squares (OLS)
-J(β) = ‖y − Xβ‖²  
+
+    J(β) = ‖y − Xβ‖²  
+
 Minimization condition:  
-∂J/∂β = −2Xᵀ(y − Xβ) = 0  ⇒  β̂₍OLS₎ = (XᵀX)⁻¹Xᵀy  
-OLS minimizes only the residual sum of squares → **unbiased** but **unstable** under multicollinearity.
+    
+    ∂J/∂β = −2Xᵀ(y − Xβ) = 0  ⇒  β̂₍OLS₎ = (XᵀX)⁻¹Xᵀy  
+
+OLS minimizes only the residual sum of squares — unbiased but unstable under multicollinearity.
 
 ---
 
 ### 2. Ridge Regression (L2 Regularization)
-J(β) = ‖y − Xβ‖² + λ‖β‖²  
+
+    J(β) = ‖y − Xβ‖² + λ‖β‖²  
+
 Setting the derivative to zero:  
-∂J/∂β = −2Xᵀ(y − Xβ) + 2λβ = 0  
-⇒ (XᵀX + λI)β̂₍Ridge₎ = Xᵀy  
-Ridge adds an **L2 penalty** that **shrinks coefficients** and **reduces variance**.
+    
+    ∂J/∂β = −2Xᵀ(y − Xβ) + 2λβ = 0  ⇒ (XᵀX + λI)β̂₍Ridge₎ = Xᵀy  
+
+Ridge adds an L2 penalty that shrinks coefficients and reduces variance.
 
 ---
 
 ### 3. Lasso Regression (L1 Regularization)
-J(β) = ‖y − Xβ‖² + λ‖β‖₁  
-Since |β| is not differentiable at zero, we use **subgradients**:  
-∂J/∂βⱼ = −2xⱼᵀ(y − Xβ) + λ sign(βⱼ)  
+
+    J(β) = ‖y − Xβ‖² + λ‖β‖₁  
+
+Since |β| is not differentiable at zero, we use subgradients:  
+
+    ∂J/∂βⱼ = −2xⱼᵀ(y − Xβ) + λ·sign(βⱼ)  
+
 At the minimum:  
-0 ∈ ∂J/∂βⱼ  ⇒  some β̂ⱼ = 0  
-Lasso performs **automatic variable selection** by setting some coefficients exactly to zero.
+
+    0 ∈ ∂J/∂βⱼ  ⇒  some β̂ⱼ = 0  
+
+Lasso performs automatic variable selection by setting some coefficients exactly to zero.
 
 ---
 
 ### 4. ElasticNet (L1 + L2 Regularization)
-J(β) = ‖y − Xβ‖² + λ[(1 − γ)‖β‖² + γ‖β‖₁]  
+
+    J(β) = ‖y − Xβ‖² + λ[(1 − γ)‖β‖² + γ‖β‖₁]  
+
 Gradient with respect to β:  
-∂J/∂β = −2Xᵀ(y − Xβ) + 2λ(1 − γ)β + λγ sign(β)  
-ElasticNet blends **Lasso’s sparsity** and **Ridge’s stability**, making it **robust under correlated predictors**.
+
+    ∂J/∂β = −2Xᵀ(y − Xβ) + 2λ(1 − γ)β + λγ·sign(β)  
+
+ElasticNet blends Lasso’s sparsity and Ridge’s stability, making it robust under correlated predictors.
 
 ---
 
